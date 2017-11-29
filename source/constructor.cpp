@@ -1,5 +1,6 @@
 #include "constructor.hpp"
-
+extern int* availableColors;
+extern int counter;
 /*returns an array of size matrixsize + 1
   the first element is the k-coloring!!!*/
 int* constructSolution(const int matrixSize, int** matrix)
@@ -59,24 +60,33 @@ int* constructNewSolution(const int matrixSize, int** matrix, const int* solutio
     srand (time(NULL));
     int* newSolution = new int[matrixSize + 1]; 
     int randomNumber = 0;
-
-    /*while(!randomNumber)
-    {
-        randomNumber = (rand() % 100) % solution[0];
-    }*/
     
-    randomNumber = (rand() % 100) % solution[0];
+    randomNumber = ((rand() % 100) % counter) + 1;
 
-    if(randomNumber == 0)
-    {
-        randomNumber++;
-    }
-
-    int maxColor = solution[0], newColor = 0;
+    int maxColor = counter, newColor = 0;
     int end = 0;
     int* matrizColor = new int[maxColor];
-    printf("COR RETIRADA = %d\n", randomNumber);
     newSolution[0] = solution[0]+1;
+
+    while(1)
+    {
+        if(availableColors[randomNumber-1] == 1)
+        {
+            if(randomNumber == counter)
+            {
+                randomNumber = 1;
+                continue;
+            }
+            randomNumber++;
+            continue;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    printf("COR RETIRADA = %d\n", randomNumber);
 
     for(int y=0; y < maxColor; y++)
     {
@@ -105,17 +115,17 @@ int* constructNewSolution(const int matrixSize, int** matrix, const int* solutio
                 {
                     //matrizColor[newSolution[neighbour]-1] = 1;  
                     matrizColor[solution[neighbour]-1] = 1;
+                    //printf("Vértice = %d \tVizinho[%d]: Cor = solution[%d]\n", vertex, neighbour+1, solution[neighbour+1]);
                 }
             }
 
             for(int k=0; k < maxColor; k++)
             {
-                if(!(matrizColor[k] == 1) )          //Só seta a nova cor se os vizinhos não possuam essa cor
+                if(!(matrizColor[k] == 1) && !(availableColors[k] == 1))          //Só seta a nova cor se os vizinhos não possuam essa cor
                 {
-                    newColor = k;
+                    newColor = k+1;
 
-
-                    if(newColor==randomNumber || newColor==-1)
+                    if(newColor==randomNumber)
                     {
                         newColor=0;
                         continue;
@@ -141,6 +151,6 @@ int* constructNewSolution(const int matrixSize, int** matrix, const int* solutio
     }
 
     newSolution[0] = solution[0] - 1;
-
+    availableColors[randomNumber-1] = 1;
     return newSolution;
 }
